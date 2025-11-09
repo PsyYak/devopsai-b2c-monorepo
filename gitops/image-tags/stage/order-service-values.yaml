@@ -1,0 +1,6 @@
+image:
+  repository: ghcr.io/OWNER/order-service
+  tag: "latest"   # bump this to promote
+env:
+  - name: SECRET_KEY
+    value: "stage-secret-order"

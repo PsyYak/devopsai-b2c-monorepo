@@ -1,0 +1,72 @@
+name: Build & Push changed services (GHCR)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      user_changed: ${{ steps.filter.outputs.user }}
+      order_changed: ${{ steps.filter.outputs.order }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            user:
+              - 'services/user-service/**'
+            order:
+              - 'services/order-service/**'
+
+  build-push-user:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.user_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push user-service
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/user-service
+          SHA: ${{ github.sha }}
+        run: |
+          docker build -t $IMAGE:latest -t $IMAGE:${SHA::7} services/user-service
+          docker push $IMAGE:latest
+          docker push $IMAGE:${SHA::7}
+
+  build-push-order:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.order_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push order-service
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/order-service
+          SHA: ${{ github.sha }}
+        run: |
+          docker build -t $IMAGE:latest -t $IMAGE:${SHA::7} services/order-service
+          docker push $IMAGE:latest
+          docker push $IMAGE:${SHA::7}

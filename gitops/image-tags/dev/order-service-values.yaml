@@ -1,0 +1,6 @@
+image:
+  repository: ghcr.io/OWNER/order-service
+  tag: "latest"
+env:
+  - name: SECRET_KEY
+    value: "dev-secret-order"

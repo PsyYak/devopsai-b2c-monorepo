@@ -1,0 +1,13 @@
+services:
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "5001:5000"
+    environment:
+      - SECRET_KEY=dev-secret
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "5002:5000"
+    environment:
+      - SECRET_KEY=dev-secret

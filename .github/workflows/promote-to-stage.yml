@@ -1,0 +1,35 @@
+name: Promote to stage
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Short SHA (or tag) to promote for both services"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update stage values files
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          sed -i 's/^\(\s*tag:\s*\).*/\1"'${TAG}'"/' gitops/image-tags/stage/user-service-values.yaml
+          sed -i 's/^\(\s*tag:\s*\).*/\1"'${TAG}'"/' gitops/image-tags/stage/order-service-values.yaml
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Promote to stage: ${{ github.event.inputs.tag }}"
+          title: "Promote to stage: ${{ github.event.inputs.tag }}"
+          branch: "promote/${{ github.event.inputs.tag }}"
+          body: |
+            This PR bumps stage image tags to **${{ github.event.inputs.tag }}**.
+            Merging will trigger ArgoCD to deploy to the **b2c-stage** namespace.
