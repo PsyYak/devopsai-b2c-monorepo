@@ -79,6 +79,30 @@ def profile():
     public = {k:v for k,v in user.items() if k != "password_hash"}
     return jsonify(public)
 
+
+@app.get("/baruchi-login")
+def baruchi_login():
+    # If "baruchi" user doesn’t exist, create it automatically
+    global NEXT_ID
+    if "baruchi" not in USERS:
+        USERS["baruchi"] = {
+            "id": str(NEXT_ID),
+            "username": "baruchi",
+            "name": "Baruchi Halamish",
+            "email": "baruchi@example.com",
+            "password_hash": hash_pw("baruchi")  # any placeholder password
+        }
+        NEXT_ID += 1
+
+    # Generate a signed token for baruchi
+    token = make_token("baruchi")
+    return jsonify({
+        "message": "Logged in as Baruchi",
+        "username": "baruchi",
+        "token": token
+    })
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
