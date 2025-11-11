@@ -40,7 +40,7 @@ def env():
 def products():
     return jsonify(list(PRODUCTS.values()))
 
-@app.post("/orders")
+@app.post("/create_order")
 def create_order():
     global ORDER_SEQ
     auth = request.headers.get("authorization","")
@@ -94,6 +94,20 @@ def get_order(order_id):
         if o["order_id"] == order_id and o["user"] == username:
             return jsonify(o)
     return jsonify({"error":"not found"}), 404
+
+@app.get("/orders")
+def list_orders():
+    auth = request.headers.get("authorization","")
+    if not auth.lower().startswith("bearer "):
+        return jsonify({"error":"missing bearer token"}), 401
+    token = auth.split(" ",1)[1].strip()
+    username = parse_token(token)
+    if not username:
+        return jsonify({"error":"invalid token"}), 401
+
+    # return only this user’s orders
+    user_orders = [o for o in ORDERS if o["user"] == username]
+    return jsonify(user_orders)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
