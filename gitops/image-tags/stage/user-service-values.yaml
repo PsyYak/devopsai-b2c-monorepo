@@ -4,6 +4,8 @@ image:
 env:
   - name: SECRET_KEY
     value: "stage-secret-user"
+  - name: APP_ENV
+    value: "stage"
 service:
   type: NodePort
   port: 80

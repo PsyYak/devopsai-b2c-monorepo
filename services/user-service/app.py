@@ -5,6 +5,7 @@ import hashlib, os
 app = Flask(__name__)
 SECRET = os.getenv("SECRET_KEY", "dev-secret")
 signer = URLSafeSerializer(SECRET, salt="user-auth")
+ENVIRONMENT = os.getenv("APP_ENV", "unknown")  # set via Helm values per env
 
 USERS = {}
 NEXT_ID = 1
@@ -24,7 +25,11 @@ def parse_token(token: str):
 
 @app.get("/healthz")
 def healthz():
-    return jsonify({"status": "ok", "service": "user-service"})
+    return jsonify({"status": "ok", "service": "user-service", "env": ENVIRONMENT})
+
+@app.get("/env")
+def env():
+    return jsonify({"env": ENVIRONMENT})
 
 @app.post("/register")
 def register():

@@ -6,6 +6,8 @@ import os
 app = Flask(__name__)
 SECRET = os.getenv("SECRET_KEY","dev-secret")
 signer = URLSafeSerializer(SECRET, salt="user-auth")
+ENVIRONMENT = os.getenv("APP_ENV", "unknown")  # set via Helm values per env
+
 
 # toy catalog and orders (demo)
 PRODUCTS = {
@@ -28,7 +30,11 @@ def money(x):
 
 @app.get("/healthz")
 def healthz():
-    return jsonify({"status":"ok","service":"order-service"})
+    return jsonify({"status": "ok", "service": "order-service", "env": ENVIRONMENT})
+
+@app.get("/env")
+def env():
+    return jsonify({"env": ENVIRONMENT})
 
 @app.get("/products")
 def products():

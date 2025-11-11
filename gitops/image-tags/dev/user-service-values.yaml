@@ -4,6 +4,8 @@ image:
 env:
   - name: SECRET_KEY
     value: "dev-secret-user"
+  - name: APP_ENV
+    value: "dev"
 
 service:
   type: NodePort

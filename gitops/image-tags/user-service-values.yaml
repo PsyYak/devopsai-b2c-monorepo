@@ -4,3 +4,5 @@ image:
 env:
   - name: SECRET_KEY
     value: "stage-secret-user"
+  - name: APP_ENV
+    value: "default"
