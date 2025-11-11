@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/baruchihalamish20/user-service
-  tag: "3bf801b"
+  tag: "c00f583"
 env:
   - name: SECRET_KEY
     value: "stage-secret-user"
