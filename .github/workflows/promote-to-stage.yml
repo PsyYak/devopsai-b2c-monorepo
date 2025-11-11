@@ -30,6 +30,7 @@ jobs:
           commit-message: "Promote to stage: ${{ github.event.inputs.tag }}"
           title: "Promote to stage: ${{ github.event.inputs.tag }}"
           branch: "promote/${{ github.event.inputs.tag }}"
+          delete-branch: true        # ⚡ automatically deletes after merge (requires the setting or PAT with delete permission)
           body: |
             This PR bumps stage image tags to **${{ github.event.inputs.tag }}**.
             Merging will trigger ArgoCD to deploy to the **b2c-stage** namespace.
