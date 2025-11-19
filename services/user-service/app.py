@@ -9,7 +9,7 @@ ENVIRONMENT = os.getenv("APP_ENV", "unknown")  # set via Helm values per env
 
 USERS = {}
 NEXT_ID = 1
-
+#this is just a comment to test the CI/CD pipeline
 def hash_pw(pw: str) -> str:
     return hashlib.sha256(pw.encode("utf-8")).hexdigest()
 

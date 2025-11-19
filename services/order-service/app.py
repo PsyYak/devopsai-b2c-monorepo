@@ -9,7 +9,7 @@ SECRET = os.getenv("SECRET_KEY","dev-secret")
 signer = URLSafeSerializer(SECRET, salt="user-auth")
 ENVIRONMENT = os.getenv("APP_ENV", "unknown")  # set via Helm values per env
 
-
+#this is just a comment to test the CI/CD pipeline
 # toy catalog and orders (demo)
 PRODUCTS = {
     "p1": {"id":"p1","name":"Wireless Mouse","price": 19.99},
