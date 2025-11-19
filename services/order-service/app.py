@@ -33,6 +33,11 @@ def money(x):
 def healthz():
     return jsonify({"status": "ok", "service": "order-service", "env": ENVIRONMENT})
 
+
+@app.get("/yakir")
+def yakir():
+    return jsonify({"message":"Yakir is the best"})
+
 @app.get("/env")
 def env():
     return jsonify({"env": ENVIRONMENT})
