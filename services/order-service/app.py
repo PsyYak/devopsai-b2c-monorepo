@@ -31,6 +31,9 @@ def money(x):
 
 @app.get("/healthz")
 def healthz():
+    unhealthy = os.getenv("ORDER_SERVICE_UNHEALTHY") == "1"
+    if unhealthy:
+        return jsonify({"status": "error", "service": "order-service"}), 503
     return jsonify({"status": "ok", "service": "order-service", "env": ENVIRONMENT})
 
 
