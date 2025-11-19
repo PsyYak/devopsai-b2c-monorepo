@@ -28,6 +28,14 @@ curl -s http://localhost:5001/register -H "content-type: application/json" -d '{
   "username":"alice","password":"p@ss","name":"Alice A.","email":"alice@example.com"
 }' | jq .
 ```
+Sometimes it won't work so run ```winget install jqlang.jq```
+then, if it fails again, run 
+```
+Invoke-WebRequest -Uri http://localhost:5001/register `
+  -Method Post `
+  -Headers @{ "Content-Type" = "application/json" } `
+  -Body '{"username":"yakir","password":"p@ss","name":"Yakir M.","email":"yakir@example.com"}'
+```
 
 2) **Login** to get token
 ```bash
