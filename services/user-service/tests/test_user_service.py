@@ -1,7 +1,7 @@
 import importlib.util, pathlib
 
 def load_app():
-    p = pathlib.Path("/user-service/app.py")
+    p = pathlib.Path("..", "user-service", "app.py")
     spec = importlib.util.spec_from_file_location("user_app", p)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)  # type: ignore
