@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/baruchihalamish20/order-service
-  tag: "5e541ae"
+  tag: "c22ed2f"
 env:
   - name: SECRET_KEY
     value: "dev-secret-order"
