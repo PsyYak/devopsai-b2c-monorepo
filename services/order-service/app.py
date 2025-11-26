@@ -39,7 +39,7 @@ def healthz():
 
 @app.get("/yakir")
 def yakir():
-    return jsonify({"message":"Yakir is the best"})
+    return jsonify({"message":"Yakir is the best!(in order-service)"})
 
 @app.get("/env")
 def env():

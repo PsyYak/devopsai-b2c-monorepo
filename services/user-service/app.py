@@ -27,6 +27,11 @@ def parse_token(token: str):
 def healthz():
     return jsonify({"status": "ok", "service": "user-service", "env": ENVIRONMENT})
 
+@app.get("/yakir")
+def yakir():
+    return jsonify({"message": "Yakir is the best!(in user-service)"})
+
+
 @app.get("/env")
 def env():
     return jsonify({"env": ENVIRONMENT})
