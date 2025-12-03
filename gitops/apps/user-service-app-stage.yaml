@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/BaruchiHalamish20/devopsai-b2c-monorepo.git
+    repoURL: https://github.com/PsyYak/devopsai-b2c-monorepo.git
     targetRevision: master
     path: helm/user-service
     helm:

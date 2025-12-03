@@ -1,11 +1,52 @@
 from flask import Flask, request, jsonify, redirect, url_for
 from itsdangerous import URLSafeSerializer
 import hashlib, os
+import time
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
 SECRET = os.getenv("SECRET_KEY", "dev-secret")
 signer = URLSafeSerializer(SECRET, salt="user-auth")
 ENVIRONMENT = os.getenv("APP_ENV", "unknown")  # set via Helm values per env
+
+# Prometheus metrics
+http_requests_total = Counter(
+    'http_requests_total',
+    'Total HTTP requests',
+    ['method', 'endpoint', 'status']
+)
+
+http_request_duration_seconds = Histogram(
+    'http_request_duration_seconds',
+    'HTTP request duration in seconds',
+    ['method', 'endpoint']
+)
+
+# Add metrics endpoint
+@app.route('/metrics')
+def metrics():
+    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+
+# Request timing middleware
+@app.before_request
+def before_request():
+    request.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    # Record metrics
+    duration = time.time() - request.start_time
+    endpoint = request.endpoint or 'unknown'
+    http_request_duration_seconds.labels(
+        method=request.method,
+        endpoint=endpoint
+    ).observe(duration)
+    http_requests_total.labels(
+        method=request.method,
+        endpoint=endpoint,
+        status=response.status_code
+    ).inc()
+    return response
 
 USERS = {}
 NEXT_ID = 1

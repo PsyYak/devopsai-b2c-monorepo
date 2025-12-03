@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/baruchihalamish20/order-service
+  repository: ghcr.io/psyyak/order-service
   tag: "71c42e4"
 env:
   - name: SECRET_KEY

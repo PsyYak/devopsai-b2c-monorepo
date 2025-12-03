@@ -314,3 +314,104 @@ token: ${{ steps.app-token.outputs.token }}
 ---
 
 This ensures your **Promote to stage** workflow runs smoothly regardless of org policies and keeps your deployment flow secure and auditable.
+
+---
+
+## Monitoring with Prometheus and Grafana
+
+The application includes monitoring infrastructure using Prometheus for metrics collection and Grafana for visualization.
+
+### Local Development (Docker Compose)
+
+When you run `docker compose up`, Prometheus and Grafana are automatically started:
+
+- **Prometheus**: http://localhost:9090
+  - Scrapes metrics from both `user-service` and `order-service` every 15 seconds
+  - Metrics are exposed at `/metrics` endpoint on each service
+
+- **Grafana**: http://localhost:3000
+  - Default credentials: `admin` / `admin`
+  - Pre-configured Prometheus datasource
+  - Pre-loaded "Flask Applications Dashboard" with HTTP metrics
+
+#### Viewing Metrics
+
+1. Start all services:
+   ```bash
+   docker compose up --build
+   ```
+
+2. Generate some traffic to see metrics:
+   ```bash
+   curl http://localhost:5001/healthz
+   curl http://localhost:5002/healthz
+   ```
+
+3. View metrics in Prometheus:
+   - Open http://localhost:9090
+   - Go to Status → Targets to see scrape targets
+   - Go to Graph and try queries like:
+     - `rate(http_requests_total[5m])`
+     - `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))`
+
+4. View dashboards in Grafana:
+   - Open http://localhost:3000
+   - Login with `admin`/`admin`
+   - Navigate to Dashboards → Flask Applications Dashboard
+
+### Kubernetes Deployment (Helm)
+
+Deploy the monitoring stack using the included Helm chart:
+
+```bash
+# Install monitoring stack
+helm install monitoring ./helm/monitoring --namespace monitoring --create-namespace
+
+# Or install with custom values
+helm install monitoring ./helm/monitoring \
+  --namespace monitoring \
+  --create-namespace \
+  --set grafana.adminPassword=your-password
+```
+
+#### Access Monitoring Services
+
+- **Prometheus**: Access via NodePort `30090` (if using NodePort service type)
+  ```bash
+  # Get node IP
+  kubectl get nodes -o wide
+  
+  # Access: http://<node-ip>:30090
+  ```
+
+- **Grafana**: Access via NodePort `30030` (if using NodePort service type)
+  ```bash
+  # Access: http://<node-ip>:30030
+  # Default credentials: admin / admin
+  ```
+
+#### Service Discovery
+
+The Helm charts for `user-service` and `order-service` include Prometheus scrape annotations:
+- `prometheus.io/scrape: "true"`
+- `prometheus.io/port: "5000"`
+- `prometheus.io/path: "/metrics"`
+
+Prometheus will automatically discover and scrape these services using Kubernetes pod discovery.
+
+### Metrics Exposed
+
+Both services expose the following Prometheus metrics:
+
+- `http_requests_total` - Counter of HTTP requests (labeled by method, endpoint, status code)
+- `http_request_duration_seconds` - Histogram of request duration (labeled by method, endpoint)
+
+### Grafana Dashboard
+
+The included dashboard provides:
+- HTTP Request Rate (requests per second)
+- HTTP Request Duration (95th percentile)
+- Total HTTP Requests (counter)
+- HTTP Error Rate (5xx errors)
+
+You can customize dashboards by editing `monitoring/grafana/dashboards/flask-apps.json` for local development or the ConfigMap in the Helm chart for Kubernetes deployments.

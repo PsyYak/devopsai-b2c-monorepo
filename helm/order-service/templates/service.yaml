@@ -4,6 +4,10 @@ metadata:
   name: {{ include "order-service.fullname" . }}
   labels:
     {{- include "order-service.labels" . | nindent 4 }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "5000"
+    prometheus.io/path: "/metrics"
 spec:
   # 👇 Use service.type from values.yaml (NodePort for Docker Desktop, LoadBalancer for cloud)
   type: {{ .Values.service.type | default "ClusterIP" }}
